@@ -24,6 +24,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.alezzgo.testpag.ui.theme.TestPagTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        println(viewModel.str)
+
         setContent {
             val itemList = cachedListState.collectAsState()
 
@@ -82,7 +84,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     @Composable
     fun CardsPage(items: List<String>, modifier: Modifier) {
         val listState = rememberLazyListState()
@@ -106,18 +107,6 @@ class MainActivity : ComponentActivity() {
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            item {
-                OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            listState.scrollToItem(40)
-                        }
-                    }
-                ) {
-                    Text(text = "Scroll to 40")
-                }
-            }
             items(items) { item ->
                 Card(item)
             }
