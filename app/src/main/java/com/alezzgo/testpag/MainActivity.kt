@@ -10,14 +10,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,12 +31,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -77,10 +75,12 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun CardsPage(items: List<Message>, modifier: Modifier) {
         val listState = rememberLazyListState()
+        val corScope = rememberCoroutineScope()
 
         LaunchedEffect(listState) {
             snapshotFlow {
                 val visibleItems = listState.layoutInfo.visibleItemsInfo
+                println("first visible item: ${visibleItems.firstOrNull()?.key ?: "null"} with index ${visibleItems.firstOrNull()?.index ?: "null"}")
 
                 val middleIndex = visibleItems
                     .map { it.index }
@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f)){
+            Box(modifier = Modifier.weight(1f)) {
                 LazyColumn(
                     reverseLayout = true,
                     modifier = Modifier.align(Alignment.BottomCenter),
@@ -106,8 +106,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            Row(modifier = Modifier
-                .fillMaxWidth()) {
+            LaunchedEffect(items) {
+                println("firstVisibleItemIndex ${Random.nextLong()} from launched effect: ${listState.firstVisibleItemIndex}")
+                println("content of zero: ${items[0].content}")
+                if (listState.firstVisibleItemIndex == 1) {
+                    listState.animateScrollToItem(0)
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
                 Button(modifier = Modifier.weight(1f), onClick = {
                     lifecycleScope.launch {
                         viewModel.cachedListState.emit(
@@ -117,11 +127,12 @@ class MainActivity : ComponentActivity() {
                 }) {
                     Text("Add")
                 }
-                Button(modifier = Modifier.weight(1f),onClick = {
+                Button(modifier = Modifier.weight(1f), onClick = {
                     lifecycleScope.launch {
                         viewModel.cachedListState.emit(
                             viewModel.cachedListState.value.drop(1)
                         )
+
                     }
                 }) {
                     Text("Remove")
@@ -166,6 +177,7 @@ class MainActivity : ComponentActivity() {
 
         }
     }
+
     @Preview(showBackground = true)
     @Composable
     fun PreviewCardsPage() {
