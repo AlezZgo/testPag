@@ -92,17 +92,16 @@ class MainActivity : ComponentActivity() {
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.weight(1f)) {
-                LazyColumn(
-                    reverseLayout = true,
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    state = listState,
-                ) {
-                    items(items, key = { item -> item.id }) { item ->
-                        Card(modifier = Modifier.animateItemPlacement(), item)
-                    }
+            LazyColumn(
+                reverseLayout = true,
+                modifier = Modifier.weight(1f),
+                state = listState,
+            ) {
+                items(items, key = { item -> item.id }) { item ->
+                    Card(modifier = Modifier.animateItemPlacement(), item)
                 }
             }
+
 
             LaunchedEffect(items) {
                 println("firstVisibleItemIndex ${Random.nextLong()} from launched effect: ${listState.firstVisibleItemIndex}")
@@ -113,8 +112,7 @@ class MainActivity : ComponentActivity() {
             }
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Button(modifier = Modifier.weight(1f), onClick = {
                     lifecycleScope.launch {

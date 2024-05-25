@@ -22,10 +22,10 @@ class MainViewModel @Inject constructor() : ViewModel() {
         ) { cachedList, middleVisibleItemIndex ->
             println("middle element: $middleVisibleItemIndex")
 
-            if (cachedList.size - middleVisibleItemIndex <= 20) {
-                cachedListState.emit(cachedList)
-                println("loaded 50 elements")
-            }
+//            if (cachedList.size - middleVisibleItemIndex <= 20) {
+//                cachedListState.emit(cachedList)
+//                println("loaded 50 elements")
+//            }
         }.launchIn(viewModelScope)
     }
 
