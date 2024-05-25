@@ -10,7 +10,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -98,7 +97,6 @@ class MainActivity : ComponentActivity() {
                     reverseLayout = true,
                     modifier = Modifier.align(Alignment.BottomCenter),
                     state = listState,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(items, key = { item -> item.id }) { item ->
                         Card(modifier = Modifier.animateItemPlacement(), item)
