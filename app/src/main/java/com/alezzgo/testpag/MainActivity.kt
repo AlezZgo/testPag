@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
         Column(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 reverseLayout = true,
-                modifier = modifier,
+                modifier = Modifier.weight(1f),
                 state = listState,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -101,9 +101,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
             Row(modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)) {
-                Button(onClick = {
+                .fillMaxWidth()) {
+                Button(modifier = Modifier.weight(1f), onClick = {
                     lifecycleScope.launch {
                         viewModel.cachedListState.emit(
                             listOf(Message.random()) + viewModel.cachedListState.value
@@ -112,7 +111,7 @@ class MainActivity : ComponentActivity() {
                 }) {
                     Text("Add")
                 }
-                Button(onClick = {
+                Button(modifier = Modifier.weight(1f),onClick = {
                     lifecycleScope.launch {
                         viewModel.cachedListState.emit(
                             viewModel.cachedListState.value.drop(1)
