@@ -12,6 +12,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,9 +34,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
@@ -90,16 +93,19 @@ class MainActivity : ComponentActivity() {
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(
-                reverseLayout = true,
-                modifier = Modifier.weight(1f),
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(items, key = { item -> item.id }) { item ->
-                    Card(modifier = Modifier.animateItemPlacement(), item)
+            Box(modifier = Modifier.weight(1f)){
+                LazyColumn(
+                    reverseLayout = true,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    state = listState,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(items, key = { item -> item.id }) { item ->
+                        Card(modifier = Modifier.animateItemPlacement(), item)
+                    }
                 }
             }
+
             Row(modifier = Modifier
                 .fillMaxWidth()) {
                 Button(modifier = Modifier.weight(1f), onClick = {
