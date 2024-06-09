@@ -1,4 +1,4 @@
-package com.alezzgo.testpag
+package com.alezzgo.testpag.core
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
