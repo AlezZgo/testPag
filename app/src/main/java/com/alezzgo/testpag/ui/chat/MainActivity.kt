@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.alezzgo.testpag.core.cachedList
+import com.alezzgo.testpag.ui.composables.MessageCard
+import com.alezzgo.testpag.ui.model.Message
 import com.alezzgo.testpag.ui.theme.TestPagTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -97,7 +100,7 @@ class MainActivity : ComponentActivity() {
                 state = listState,
             ) {
                 items(items, key = { item -> item.id }) { item ->
-                    Card(modifier = Modifier.animateItemPlacement(), item)
+                    MessageCard(modifier = Modifier.animateItemPlacement(), item)
                 }
             }
 
@@ -139,41 +142,6 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    @Composable
-    fun Card(modifier: Modifier = Modifier, message: Message) {
-
-        val isClicked = remember {
-            mutableStateOf(false)
-        }
-
-        OutlinedCard(modifier = modifier
-            .fillMaxWidth(), onClick = { isClicked.value = !isClicked.value }) {
-            Row {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = "Item: ${message.content}"
-                )
-                AnimatedVisibility(visible = isClicked.value) {
-                    Text(text = "Show!!!")
-                }
-
-                val rotation = animateFloatAsState(targetValue = if (isClicked.value) 180f else 0f)
-
-                Image(
-                    imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(CenterVertically)
-                        .graphicsLayer(
-                            rotationZ = rotation.value
-                        )
-                )
-            }
-
-
-        }
-    }
-
     @Preview(showBackground = true)
     @Composable
     fun PreviewCardsPage() {
@@ -187,10 +155,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-data class Message(val id: Long, val content: String) {
-    companion object {
-        fun random() = Message(Random.nextLong(), Random.nextUInt(1000u).toString())
-    }
-}
-
