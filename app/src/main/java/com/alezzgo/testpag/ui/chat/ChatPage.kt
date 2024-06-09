@@ -4,18 +4,29 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import com.alezzgo.testpag.ui.chat.ChatAction.OnSendPanelInputChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
 import com.alezzgo.testpag.ui.model.Message
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,7 +47,8 @@ fun ChatPage(chatState : ChatState, onAction: (ChatAction) -> Unit) {
             }
         }
 
-        SendPanel()
+        SendPanel(onAction = onAction)
+        Spacer(modifier = Modifier.size(32.dp))
     }
 }
 
@@ -68,28 +80,13 @@ fun AutoScrollLaunchedEffect(listState: LazyListState) {
 }
 
 @Composable
-private fun SendPanel(modifier: Modifier = Modifier) {
+private fun SendPanel(modifier: Modifier = Modifier,onAction: (ChatAction) -> Unit) {
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
-        Button(modifier = Modifier.weight(1f), onClick = {
-//            lifecycleScope.launch {
-//                viewModel.cachedListState.emit(
-//                    listOf(Message.random()) + viewModel.cachedListState.value
-//                )
-//            }
-        }) {
-            Text("Add")
-        }
-        Button(modifier = Modifier.weight(1f), onClick = {
-//            lifecycleScope.launch {
-//                viewModel.cachedListState.emit(
-//                    viewModel.cachedListState.value.drop(1)
-//                )
-//
-//            }
-        }) {
-            Text("Remove")
+        OutlinedTextField(modifier = Modifier.weight(1f),value = "", onValueChange = {})
+        IconButton(onClick = {}) {
+            Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = null)
         }
     }
 }

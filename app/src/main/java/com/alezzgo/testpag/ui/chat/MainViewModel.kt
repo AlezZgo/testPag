@@ -24,6 +24,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
         when (action) {
             ChatAction.FirstVisibleItemChanged -> TODO()
             ChatAction.SendMessage -> TODO()
+            is ChatAction.OnSendPanelInputChanged -> TODO()
         }
     }
 
