@@ -15,20 +15,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.alezzgo.testpag.ui.chat.ChatAction.OnSendPanelInputChanged
+import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
-import com.alezzgo.testpag.ui.model.Message
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,7 +43,7 @@ fun ChatPage(chatState : ChatState, onAction: (ChatAction) -> Unit) {
             }
         }
 
-        SendPanel(onAction = onAction)
+        SendPanel(inputText = chatState.inputText, onAction = onAction)
         Spacer(modifier = Modifier.size(32.dp))
     }
 }
@@ -80,12 +76,12 @@ fun AutoScrollLaunchedEffect(listState: LazyListState) {
 }
 
 @Composable
-private fun SendPanel(modifier: Modifier = Modifier,onAction: (ChatAction) -> Unit) {
+private fun SendPanel(modifier: Modifier = Modifier, inputText : String, onAction: (ChatAction) -> Unit) {
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
-        OutlinedTextField(modifier = Modifier.weight(1f),value = "", onValueChange = {})
-        IconButton(onClick = {}) {
+        OutlinedTextField(modifier = Modifier.weight(1f),value = inputText, onValueChange = { value -> onAction.invoke(InputTextChanged(value)) })
+        IconButton(onClick = { onAction.invoke(ChatAction.SendMessage) }) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = null)
         }
     }

@@ -5,5 +5,5 @@ sealed interface ChatAction {
 
     data object SendMessage : ChatAction
 
-    data class OnSendPanelInputChanged(val value: String) : ChatAction
+    data class InputTextChanged(val value: String) : ChatAction
 }
