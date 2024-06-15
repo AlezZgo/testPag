@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.alezzgo.testpag.ui.theme.TestPagTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,12 +30,12 @@ class MainActivity : ComponentActivity() {
             TestPagTheme {
 //                val navController = rememberNavController()
 
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
+//                Scaffold(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                ) {
                     ChatPage(chatState, chatEvents, onAction = viewModel::onAction)
-                }
+//                }
             }
         }
     }
