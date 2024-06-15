@@ -1,6 +1,7 @@
 package com.alezzgo.testpag.ui.chat
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,61 +23,49 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
 @Composable
 fun ChatPage(
+    navController: NavController,
     chatState: ChatState,
     chatEvents: Flow<ChatEvent>,
     onAction: (ChatAction) -> Unit
 ) {
     val listState = rememberLazyListState()
-    val uiScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-    ScrollToLaunchedEffect(listState,chatEvents,uiScope)
-    FirstVisibleItemChangedLaunchedEffect(listState, onAction)
+    ObserveAsEvents(flow = chatEvents) { event ->
+        Log.d("ChatPage","ObserveAsEvents() event=$event")
+        when(event){
+            is ChatEvent.ScrollTo -> coroutineScope.launch { listState.animateScrollToItem(event.index) }
+            is ChatEvent.NavigateToMessageDetails -> navController.navigate(Screen.MessageDetails(event.messageId))
+        }
+    }
+    FirstVisibleItemChangedNotifier(listState,onAction)
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
             items(chatState.messages, key = { item -> item.id }) { message ->
-                MessageCard(modifier = Modifier.animateItemPlacement(), message)
+                MessageCard(modifier = Modifier.animateItemPlacement(), message, onAction = onAction)
             }
         }
 
         SendPanel(inputText = chatState.inputText, onAction = onAction)
         Spacer(modifier = Modifier.size(32.dp))
     }
-}
-
-@SuppressLint("FlowOperatorInvokedInComposition")
-@Composable
-fun ScrollToLaunchedEffect(
-    listState: LazyListState,
-    chatEvents: Flow<ChatEvent>,
-    uiScope: CoroutineScope
-) {
-    //todo
-    chatEvents.onEach { chatEvent ->
-        when (chatEvent) {
-            is ChatEvent.ScrollTo -> listState.animateScrollToItem(0)
-        }
-    }.shareIn(uiScope, replay = 0, started = SharingStarted.WhileSubscribed())
 }
 
 @Composable
@@ -90,7 +79,7 @@ fun <T> ObserveAsEvents(flow : Flow<T>, onEvent: (T) -> Unit) {
 }
 
 @Composable
-fun FirstVisibleItemChangedLaunchedEffect(
+fun FirstVisibleItemChangedNotifier(
     listState: LazyListState,
     onAction: (ChatAction) -> Unit
 ) {

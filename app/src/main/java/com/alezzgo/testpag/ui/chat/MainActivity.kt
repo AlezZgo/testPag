@@ -6,12 +6,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.alezzgo.testpag.ui.theme.TestPagTheme
+import com.alezzgo.testpag.ui.chat.Screen.*
+import com.alezzgo.testpag.ui.chatdetails.ChatDetailsPage
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -24,19 +27,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val chatState = viewModel.chatState
-            val chatEvents = viewModel.chatEvents
 
             TestPagTheme {
-//                val navController = rememberNavController()
+                val navController = rememberNavController()
 
-//                Scaffold(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                ) {
-                    ChatPage(chatState, chatEvents, onAction = viewModel::onAction)
-//                }
+                NavHost(navController = navController, startDestination = Chat){
+                    composable<Chat> {
+                        val chatState = viewModel.chatState
+                        val chatEvents = viewModel.chatEvents
+                        ChatPage(navController,chatState, chatEvents, onAction = viewModel::onAction)
+                    }
+                    composable<MessageDetails> {
+                        val args = it.toRoute<MessageDetails>()
+                        ChatDetailsPage(args.messageId)
+                    }
+                }
             }
         }
     }
+}
+
+interface Screen {
+    @Serializable
+    data object Chat : Screen
+
+    @Serializable
+    data class MessageDetails(val messageId: Long) : Screen
+
 }

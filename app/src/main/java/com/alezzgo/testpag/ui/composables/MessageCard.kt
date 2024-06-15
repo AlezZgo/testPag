@@ -2,7 +2,9 @@ package com.alezzgo.testpag.ui.composables
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,16 +19,22 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.alezzgo.testpag.ui.chat.ChatAction
 import com.alezzgo.testpag.ui.model.Message
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageCard(modifier: Modifier = Modifier, message: Message) {
+fun MessageCard(modifier: Modifier = Modifier, message: Message, onAction: (ChatAction) -> Unit) {
 
     val isClicked = remember {
         mutableStateOf(false)
     }
 
-    OutlinedCard(modifier = modifier.fillMaxWidth(), onClick = { isClicked.value = !isClicked.value }) {
+    OutlinedCard(modifier = modifier.fillMaxWidth().combinedClickable(
+        onClick = { onAction.invoke(ChatAction.OnMessageClick(message.id)) },
+        onLongClick = { isClicked.value = !isClicked.value }
+    )){
         Row {
             Text(
                 modifier = Modifier.padding(8.dp),
