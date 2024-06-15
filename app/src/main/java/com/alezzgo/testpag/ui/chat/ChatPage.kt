@@ -2,7 +2,6 @@ package com.alezzgo.testpag.ui.chat
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,11 +22,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import com.alezzgo.testpag.core.ui.ObserveAsEvents
 import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
 import kotlinx.coroutines.FlowPreview
@@ -36,7 +33,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
 @Composable
 fun ChatPage(
@@ -69,15 +65,7 @@ fun ChatPage(
     }
 }
 
-@Composable
-fun <T> ObserveAsEvents(flow : Flow<T>, onEvent: (T) -> Unit) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(flow,lifecycleOwner.lifecycle) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-            flow.collect(onEvent)
-        }
-    }
-}
+
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -93,6 +81,12 @@ fun FirstVisibleItemChangedNotifier(
             onAction.invoke(ChatAction.FirstVisibleItemChanged(firstVisibleItemIndex))
         }
     }
+    //todo как вариант взять то что ниже, ток добавить тротлер
+//    val firstVisibleItemIndex = remember { derivedStateOf { listState.firstVisibleItemIndex } }
+//
+//    LaunchedEffect(firstVisibleItemIndex.value) {
+//        onAction.invoke(ChatAction.FirstVisibleItemChanged(firstVisibleItemIndex.value))
+//    }
 }
 
 @Composable
@@ -101,9 +95,7 @@ private fun SendPanel(
     inputText: String,
     onAction: (ChatAction) -> Unit
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth()
-    ) {
+    Row(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             modifier = Modifier.weight(1f),
             value = inputText,
