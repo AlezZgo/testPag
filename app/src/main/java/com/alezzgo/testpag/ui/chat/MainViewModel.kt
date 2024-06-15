@@ -26,6 +26,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     var chatState by mutableStateOf(ChatState(cachedList,""))
         private set
 
+    //  todo think about mutableListStateOf<>
     private val _chatEvents = Channel<ChatEvent>()
     val chatEvents = _chatEvents.receiveAsFlow()
 

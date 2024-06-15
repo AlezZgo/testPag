@@ -30,6 +30,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.sample
@@ -78,6 +79,7 @@ fun <T> ObserveAsEvents(flow : Flow<T>, onEvent: (T) -> Unit) {
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
 fun FirstVisibleItemChangedNotifier(
     listState: LazyListState,
