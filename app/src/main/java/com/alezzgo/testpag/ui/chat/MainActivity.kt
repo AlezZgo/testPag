@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import com.alezzgo.testpag.ui.theme.TestPagTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,13 +24,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val chatState = viewModel.chatState
+            val chatEvents = viewModel.chatEvents
 
             TestPagTheme {
+//                val navController = rememberNavController()
+
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    ChatPage(chatState, onAction = viewModel::onAction)
+                    ChatPage(chatState, chatEvents, onAction = viewModel::onAction)
                 }
             }
         }

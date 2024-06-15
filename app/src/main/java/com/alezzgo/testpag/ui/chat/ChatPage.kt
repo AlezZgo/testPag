@@ -14,30 +14,46 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.flow.shareIn
 
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
 @Composable
-fun ChatPage(chatState : ChatState, onAction: (ChatAction) -> Unit) {
+fun ChatPage(
+    chatState: ChatState,
+    chatEvents: Flow<ChatEvent>,
+    onAction: (ChatAction) -> Unit
+) {
     val listState = rememberLazyListState()
+    val uiScope = rememberCoroutineScope()
 
-    ScrollToLaunchedEffect(listState)
-    AutoScrollLaunchedEffect(listState)
+    ScrollToLaunchedEffect(listState,chatEvents,uiScope)
+    FirstVisibleItemChangedLaunchedEffect(listState, onAction)
 
     Column(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(reverseLayout = true,modifier = Modifier.weight(1f),state = listState) {
+        LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
             items(chatState.messages, key = { item -> item.id }) { message ->
                 MessageCard(modifier = Modifier.animateItemPlacement(), message)
             }
@@ -48,39 +64,59 @@ fun ChatPage(chatState : ChatState, onAction: (ChatAction) -> Unit) {
     }
 }
 
+@SuppressLint("FlowOperatorInvokedInComposition")
 @Composable
-fun ScrollToLaunchedEffect(listState: LazyListState) {
+fun ScrollToLaunchedEffect(
+    listState: LazyListState,
+    chatEvents: Flow<ChatEvent>,
+    uiScope: CoroutineScope
+) {
+    //todo
+    chatEvents.onEach { chatEvent ->
+        when (chatEvent) {
+            is ChatEvent.ScrollTo -> listState.animateScrollToItem(0)
+        }
+    }.shareIn(uiScope, replay = 0, started = SharingStarted.WhileSubscribed())
+}
+
+@Composable
+fun <T> ObserveAsEvents(flow : Flow<T>, onEvent: (T) -> Unit) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(flow,lifecycleOwner.lifecycle) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+            flow.collect(onEvent)
+        }
+    }
+}
+
+@Composable
+fun FirstVisibleItemChangedLaunchedEffect(
+    listState: LazyListState,
+    onAction: (ChatAction) -> Unit
+) {
+    //todo Разобраться как точно работает под капотом
     LaunchedEffect(listState) {
         snapshotFlow {
-            val visibleItems = listState.layoutInfo.visibleItemsInfo
-            println("first visible item: ${visibleItems.firstOrNull()?.key ?: "null"} with index ${visibleItems.firstOrNull()?.index ?: "null"}")
-
-            val middleIndex = visibleItems
-                .map { it.index }
-                .toList()[visibleItems.size / 2]
-
-            middleIndex
-        }.distinctUntilChanged().collect { middleIndex ->
-//            viewModel.middleVisibleItemIndexState.emit(middleIndex)
+            listState.firstVisibleItemIndex
+        }.distinctUntilChanged().sample(300).collect { firstVisibleItemIndex ->
+            onAction.invoke(ChatAction.FirstVisibleItemChanged(firstVisibleItemIndex))
         }
     }
 }
 
 @Composable
-fun AutoScrollLaunchedEffect(listState: LazyListState) {
-    LaunchedEffect(listState) {
-        if (listState.firstVisibleItemIndex == 1) {
-            listState.animateScrollToItem(0)
-        }
-    }
-}
-
-@Composable
-private fun SendPanel(modifier: Modifier = Modifier, inputText : String, onAction: (ChatAction) -> Unit) {
+private fun SendPanel(
+    modifier: Modifier = Modifier,
+    inputText: String,
+    onAction: (ChatAction) -> Unit
+) {
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
-        OutlinedTextField(modifier = Modifier.weight(1f),value = inputText, onValueChange = { value -> onAction.invoke(InputTextChanged(value)) })
+        OutlinedTextField(
+            modifier = Modifier.weight(1f),
+            value = inputText,
+            onValueChange = { value -> onAction.invoke(InputTextChanged(value)) })
         IconButton(onClick = { onAction.invoke(ChatAction.SendMessage) }) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = null)
         }
