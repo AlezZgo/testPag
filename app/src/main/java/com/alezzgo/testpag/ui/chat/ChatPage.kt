@@ -60,7 +60,7 @@ fun ChatPage(
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
             items(chatState.messages, key = { item -> item.id }) { message ->
-                MessageCard(modifier = Modifier.animateItemPlacement(), message, onAction = onAction)
+                MessageCard(modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null), message, onAction = onAction)
             }
         }
 
