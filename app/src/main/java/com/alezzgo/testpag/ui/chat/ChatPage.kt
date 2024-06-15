@@ -54,6 +54,11 @@ fun ChatPage(
     FirstVisibleItemChangedNotifier(listState,onAction)
 
     Column(modifier = Modifier.fillMaxSize()) {
+
+        //todo: need fix logger spam:
+        //todo: updateAcquireFence: Did not find frame.
+        //todo: Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
+
         LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
             items(chatState.messages, key = { item -> item.id }) { message ->
                 MessageCard(modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null), message, onAction = onAction)
@@ -64,8 +69,6 @@ fun ChatPage(
         Spacer(modifier = Modifier.size(32.dp))
     }
 }
-
-
 
 @OptIn(FlowPreview::class)
 @Composable
