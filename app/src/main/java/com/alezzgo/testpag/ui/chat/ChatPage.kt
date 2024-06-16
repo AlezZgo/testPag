@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,21 +55,26 @@ fun ChatPage(
     }
     FirstVisibleItemChangedNotifier(listState,onAction)
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold {
+        Column(modifier = Modifier.padding(it)) {
 
-        //todo: need fix logger spam:
-        //todo: updateAcquireFence: Did not find frame.
-        //todo: Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
+            //todo: need fix logger spam:
+            //todo: updateAcquireFence: Did not find frame.
+            //todo: Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
 
-        LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
-            items(chatState.messages, key = { item -> item.id }) { message ->
-                MessageCard(modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null), message, onAction = onAction)
+            //todo animate smooth appear from bottom
+
+            LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
+                items(chatState.messages, key = { item -> item.id }) { message ->
+                    MessageCard(modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null), message, onAction = onAction)
+                }
             }
-        }
 
-        SendPanel(inputText = chatState.inputText, onAction = onAction)
-        Spacer(modifier = Modifier.size(32.dp))
+            SendPanel(inputText = chatState.inputText, onAction = onAction)
+            Spacer(modifier = Modifier.size(32.dp))
+        }
     }
+
 }
 
 @OptIn(FlowPreview::class)
