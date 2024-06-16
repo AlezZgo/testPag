@@ -102,7 +102,8 @@ private fun SendPanel(
         OutlinedTextField(
             modifier = Modifier.weight(1f),
             value = inputText,
-            onValueChange = { value -> onAction.invoke(InputTextChanged(value)) })
+            onValueChange = { value -> onAction.invoke(InputTextChanged(value)) }
+        )
         IconButton(onClick = { onAction.invoke(ChatAction.SendMessage) }) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = null)
         }
