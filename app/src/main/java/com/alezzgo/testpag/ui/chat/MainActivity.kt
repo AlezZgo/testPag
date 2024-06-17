@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = Chat){
                     composable<Chat> {
                         val chatState = viewModel.chatState
-                        val chatEvents = viewModel.chatEvents
+                        val chatEvents = viewModel.chatEffects
                         ChatPage(navController,chatState, chatEvents, onAction = viewModel::onAction)
                     }
                     composable<MessageDetails> {

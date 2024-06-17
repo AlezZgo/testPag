@@ -5,16 +5,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.alezzgo.testpag.ui.model.Message
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -27,8 +21,8 @@ class MainViewModel @Inject constructor() : ViewModel() {
         private set
 
     //  todo think about mutableListStateOf<>
-    private val _chatEvents = Channel<ChatEvent>()
-    val chatEvents = _chatEvents.receiveAsFlow()
+    private val _chatEffects = Channel<ChatEffect>()
+    val chatEffects = _chatEffects.receiveAsFlow()
 
     fun onAction(action: ChatAction) {
         Log.d(TAG,"onAction() action=$action")
@@ -36,7 +30,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
             is ChatAction.SendMessage -> sendMessage()
             is ChatAction.FirstVisibleItemChanged -> {  }
             is ChatAction.InputTextChanged -> chatState = chatState.copy(inputText = action.value)
-            is ChatAction.OnMessageClick -> _chatEvents.trySend(ChatEvent.NavigateToMessageDetails(action.messageId))
+            is ChatAction.OnMessageClick -> _chatEffects.trySend(ChatEffect.NavigateToMessageDetails(action.messageId))
         }
     }
 
@@ -45,7 +39,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
             messages = listOf(Message(Random.nextLong(),chatState.inputText)) + chatState.messages,
             inputText = ""
         )
-        _chatEvents.trySend(ChatEvent.ScrollTo(0))
+        _chatEffects.trySend(ChatEffect.ScrollTo(0))
     }
 
 }

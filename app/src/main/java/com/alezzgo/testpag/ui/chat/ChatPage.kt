@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,7 +39,7 @@ import kotlinx.coroutines.launch
 fun ChatPage(
     navController: NavController,
     chatState: ChatState,
-    chatEvents: Flow<ChatEvent>,
+    chatEvents: Flow<ChatEffect>,
     onAction: (ChatAction) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -49,8 +48,8 @@ fun ChatPage(
     ObserveAsEvents(flow = chatEvents) { event ->
         Log.d("ChatPage","ObserveAsEvents() event=$event")
         when(event){
-            is ChatEvent.ScrollTo -> coroutineScope.launch { listState.animateScrollToItem(event.index) }
-            is ChatEvent.NavigateToMessageDetails -> navController.navigate(Screen.MessageDetails(event.messageId))
+            is ChatEffect.ScrollTo -> coroutineScope.launch { listState.animateScrollToItem(event.index) }
+            is ChatEffect.NavigateToMessageDetails -> navController.navigate(Screen.MessageDetails(event.messageId))
         }
     }
     FirstVisibleItemChangedNotifier(listState,onAction)
