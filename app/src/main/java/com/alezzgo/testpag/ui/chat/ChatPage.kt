@@ -73,7 +73,7 @@ fun ChatPage(
                 state = listState,
                 contentPadding = PaddingValues(8.dp)
             ) {
-                items(chatState.messages, key = { item -> item.id }) { message ->
+                items(chatState.messages, key = { item -> item.messageId }) { message ->
                     MessageCard(
                         modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                         message = message,

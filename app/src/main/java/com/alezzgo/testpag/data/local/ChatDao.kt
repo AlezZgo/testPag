@@ -26,7 +26,7 @@ interface ChatDao {
     suspend fun delete(vararg message: ChatMessageEntity)
 
     @Transaction
-    @Query("SELECT * FROM ChatEntity chat LEFT JOIN ChatMessageEntity message ON chat.id=message.chatId  WHERE chat.id = :id ORDER BY message.timestamp DESC LIMIT 1")
-    fun chat(id: Long): Flow<ChatState>
+    @Query("SELECT * FROM ChatEntity chat WHERE chat.id = :chatId")
+    fun chat(chatId : Long): Flow<ChatState>
 
 }

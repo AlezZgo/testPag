@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -26,9 +27,7 @@ class ChatViewModel @Inject constructor(
 
     val chatState = chatDao.chat(0)
         .filterNotNull()
-        .onEach {
-            Log.d(TAG, "newState =$it")
-        }
+        .map { it.copy(messages = it.messages.sortedByDescending { it.timeStamp }) } //todo dao should return order by timestamp
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -50,6 +49,7 @@ class ChatViewModel @Inject constructor(
                     action.messageId
                 )
             )
+            else -> {}
         }
     }
 
@@ -58,7 +58,7 @@ class ChatViewModel @Inject constructor(
             chatDao.upsertMessage(
                 //todo Random.nextLong() replace Random.nextLong() to smth
                 ChatMessageEntity(
-                    id = Random.nextLong(),
+                    messageId = Random.nextLong(),
                     chatId = chatState.value.chat.id,
                     content = chatState.value.chat.text,
                     timeStamp = System.currentTimeMillis()
@@ -81,7 +81,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatDao.upsertChat(
                 chatState.value.chat.copy(
-                    firstVisibleMessageId = chatState.value.messages.getOrNull(currentIndex)?.id
+                    firstVisibleMessageId = chatState.value.messages.getOrNull(currentIndex)?.messageId
                 )
             )
         }

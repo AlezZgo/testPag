@@ -31,7 +31,7 @@ fun MessageCard(modifier: Modifier = Modifier, message: ChatMessageEntity, onAct
     }
 
     OutlinedCard(modifier = modifier.fillMaxWidth().combinedClickable(
-        onClick = { onAction.invoke(ChatAction.OnMessageClick(message.id)) },
+        onClick = { onAction.invoke(ChatAction.OnMessageClick(message.messageId)) },
         onLongClick = { isClicked.value = !isClicked.value }
     )){
         Row {
