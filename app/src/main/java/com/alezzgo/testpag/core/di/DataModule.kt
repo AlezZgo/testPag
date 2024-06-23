@@ -16,10 +16,15 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideDb(@ApplicationContext applicationContext : Context) = Room.databaseBuilder(
-        applicationContext,
-        ChatDatabase::class.java,
-        "chat-database"
-    ).build()
+    fun provideDb(@ApplicationContext applicationContext: Context): ChatDatabase =
+        Room.databaseBuilder(
+            applicationContext,
+            ChatDatabase::class.java,
+            "chat-database"
+        ).fallbackToDestructiveMigration()
+            .build()
 
+    @Singleton
+    @Provides
+    fun provideChatDao(db: ChatDatabase) = db.chatDao
 }

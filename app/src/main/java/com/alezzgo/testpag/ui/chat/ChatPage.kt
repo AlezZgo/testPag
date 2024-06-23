@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.alezzgo.testpag.core.Screen
 import com.alezzgo.testpag.core.ui.ObserveAsEvents
+import com.alezzgo.testpag.data.local.models.ChatState
 import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
 import kotlinx.coroutines.FlowPreview
@@ -39,22 +40,23 @@ import kotlinx.coroutines.launch
 fun ChatPage(
     navController: NavController,
     chatState: ChatState,
-    chatEvents: Flow<ChatEffect>,
+    chatEffects: Flow<ChatEffect>,
     onAction: (ChatAction) -> Unit
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    ObserveAsEvents(flow = chatEvents) { event ->
+    ObserveAsEvents(flow = chatEffects) { event ->
         Log.d("ChatPage", "ObserveAsEvents() event=$event")
         when (event) {
             is ChatEffect.ScrollTo ->
                 coroutineScope.launch { listState.animateScrollToItem(event.index) }
+
             is ChatEffect.NavigateToMessageDetails ->
                 navController.navigate(Screen.MessageDetails(messageId = event.messageId))
         }
     }
-    FirstVisibleItemChangedNotifier(listState, onAction)
+    FirstVisibleItemChangedNotifier(listState,chatState,onAction)
 
     Scaffold {
         Column(modifier = Modifier.padding(it)) {
@@ -80,7 +82,11 @@ fun ChatPage(
                 }
             }
 
-            SendPanel(modifier = Modifier.padding(8.dp), inputText = chatState.inputText, onAction = onAction)
+            SendPanel(
+                modifier = Modifier.padding(8.dp),
+                inputText = chatState.chat.text,
+                onAction = onAction
+            )
             Spacer(modifier = Modifier.size(32.dp))
         }
     }
@@ -91,6 +97,7 @@ fun ChatPage(
 @Composable
 fun FirstVisibleItemChangedNotifier(
     listState: LazyListState,
+    chatState: ChatState,
     onAction: (ChatAction) -> Unit
 ) {
     //todo Разобраться как точно работает под капотом
@@ -98,7 +105,9 @@ fun FirstVisibleItemChangedNotifier(
         snapshotFlow {
             listState.firstVisibleItemIndex
         }.distinctUntilChanged().sample(300).collect { firstVisibleItemIndex ->
-            onAction.invoke(ChatAction.FirstVisibleItemChanged(firstVisibleItemIndex))
+            if(chatState.messages.isNotEmpty()){
+                onAction.invoke(ChatAction.FirstVisibleIndexChanged(firstVisibleItemIndex))
+            }
         }
     }
     //todo как вариант взять то что ниже, ток добавить тротлер
@@ -119,7 +128,10 @@ private fun SendPanel(
         OutlinedTextField(
             modifier = Modifier.weight(1f),
             value = inputText,
-            onValueChange = { value -> onAction.invoke(InputTextChanged(value)) }
+            onValueChange = { value ->
+                Log.v("SendPanel","newValue=$value")
+                onAction.invoke(InputTextChanged(value))
+            }
         )
         IconButton(onClick = { onAction.invoke(ChatAction.SendMessage) }) {
             Icon(imageVector = Icons.AutoMirrored.Rounded.Send, contentDescription = null)

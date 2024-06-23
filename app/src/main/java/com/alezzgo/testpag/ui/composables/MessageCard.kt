@@ -19,13 +19,12 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import com.alezzgo.testpag.data.local.entities.ChatMessageEntity
 import com.alezzgo.testpag.ui.chat.ChatAction
-import com.alezzgo.testpag.ui.model.Message
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessageCard(modifier: Modifier = Modifier, message: Message, onAction: (ChatAction) -> Unit) {
+fun MessageCard(modifier: Modifier = Modifier, message: ChatMessageEntity, onAction: (ChatAction) -> Unit) {
 
     val isClicked = remember {
         mutableStateOf(false)

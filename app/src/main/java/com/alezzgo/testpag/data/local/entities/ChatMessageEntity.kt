@@ -4,9 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class MessageEntity(
+data class ChatMessageEntity(
     @PrimaryKey
     val id : Long,
     val chatId : Long,
     val content: String,
+    val timeStamp : Long
 )

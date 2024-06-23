@@ -2,28 +2,31 @@ package com.alezzgo.testpag.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.alezzgo.testpag.data.local.entities.ChatEntity
-import com.alezzgo.testpag.data.local.models.Chat
+import com.alezzgo.testpag.data.local.entities.ChatMessageEntity
+import com.alezzgo.testpag.data.local.models.ChatState
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatDao {
 
     @Upsert
-    suspend fun upsert(vararg chat: ChatEntity)
-
-//    @Insert(onConflict = OnConflictStrategy.REPLACE)
-//    suspend fun insert(chat: Chat)
+    suspend fun upsertChat(vararg chat: ChatEntity)
 
     @Delete
     suspend fun delete(vararg chat: ChatEntity)
 
+    @Upsert
+    suspend fun upsertMessage(vararg message: ChatMessageEntity)
+
+    @Delete
+    suspend fun delete(vararg message: ChatMessageEntity)
+
     @Transaction
-    @Query("SELECT * FROM ChatEntity")
-    fun chats(): Flow<List<Chat>>
+    @Query("SELECT * FROM ChatEntity chat LEFT JOIN ChatMessageEntity message ON chat.id=message.chatId  WHERE chat.id = :id ORDER BY message.timestamp DESC LIMIT 1")
+    fun chat(id: Long): Flow<ChatState>
+
 }

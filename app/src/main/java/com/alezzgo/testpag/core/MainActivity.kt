@@ -5,7 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -15,8 +18,10 @@ import com.alezzgo.testpag.core.Screen.MessageDetails
 import com.alezzgo.testpag.ui.chat.ChatPage
 import com.alezzgo.testpag.ui.chat.ChatViewModel
 import com.alezzgo.testpag.ui.chatdetails.ChatDetailsPage
+import com.alezzgo.testpag.ui.chatdetails.MessageDetailsViewModel
 import com.alezzgo.testpag.ui.theme.TestPagTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
@@ -37,16 +42,19 @@ class MainActivity : ComponentActivity() {
                     composable<Chat> {
                         val viewModel = hiltViewModel<ChatViewModel>()
 
-                        val chatState = viewModel.chatState
+                        val chatState by viewModel.chatState.collectAsStateWithLifecycle()
                         val chatEvents = viewModel.chatEffects
+
                         ChatPage(
                             navController = navController,
                             chatState = chatState,
-                            chatEvents = chatEvents,
+                            chatEffects = chatEvents,
                             onAction = viewModel::onAction
                         )
                     }
                     composable<MessageDetails> {
+                        val viewModel = hiltViewModel<MessageDetailsViewModel>()
+
                         val args = it.toRoute<MessageDetails>()
                         ChatDetailsPage(id = args.messageId)
                     }
