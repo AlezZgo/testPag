@@ -9,11 +9,7 @@ import com.alezzgo.testpag.data.local.models.ChatState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -31,7 +27,7 @@ class ChatViewModel @Inject constructor(
     val chatState = chatDao.chat(0)
         .filterNotNull()
         .onEach {
-            Log.d(TAG,"newState =$it")
+            Log.d(TAG, "newState =$it")
         }
         .stateIn(
             scope = viewModelScope,
@@ -42,12 +38,6 @@ class ChatViewModel @Inject constructor(
     private val _chatEffects = Channel<ChatEffect>()
     val chatEffects = _chatEffects.receiveAsFlow()
 
-    init {
-        chatDao.chat(0)
-            .onEach {
-                Log.d(TAG,"newState =$it")
-            }.launchIn(viewModelScope)
-    }
 
     fun onAction(action: ChatAction) {
         Log.d(TAG, "onAction() action=$action")
@@ -91,7 +81,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             chatDao.upsertChat(
                 chatState.value.chat.copy(
-                    currentFirstVisibleMessageId = chatState.value.messages[currentIndex].id
+                    firstVisibleMessageId = chatState.value.messages.getOrNull(currentIndex)?.id
                 )
             )
         }

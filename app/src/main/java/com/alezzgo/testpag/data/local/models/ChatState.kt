@@ -12,7 +12,7 @@ data class ChatState (
 ) {
     companion object {
         fun initial(id : Long) = ChatState(
-            chat = ChatEntity(id = id, text = "", currentFirstVisibleMessageId = null),
+            chat = ChatEntity(id = id, text = "", firstVisibleMessageId = null),
             messages = emptyList()
         )
     }

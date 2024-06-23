@@ -8,5 +8,5 @@ data class ChatEntity(
     @PrimaryKey
     val id : Long,
     val text : String,
-    val currentFirstVisibleMessageId : Long?
+    val firstVisibleMessageId : Long?
 )
