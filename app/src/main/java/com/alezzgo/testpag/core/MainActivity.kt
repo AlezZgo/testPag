@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             TestPagTheme {
+                //todo inject somehow
                 val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = Chat) {
@@ -39,15 +40,15 @@ class MainActivity : ComponentActivity() {
                         val chatState = viewModel.chatState
                         val chatEvents = viewModel.chatEffects
                         ChatPage(
-                            navController,
-                            chatState,
-                            chatEvents,
+                            navController = navController,
+                            chatState = chatState,
+                            chatEvents = chatEvents,
                             onAction = viewModel::onAction
                         )
                     }
                     composable<MessageDetails> {
                         val args = it.toRoute<MessageDetails>()
-                        ChatDetailsPage(args.messageId)
+                        ChatDetailsPage(id = args.messageId)
                     }
                 }
             }

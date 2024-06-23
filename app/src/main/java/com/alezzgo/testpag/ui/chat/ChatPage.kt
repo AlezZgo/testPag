@@ -1,8 +1,8 @@
 package com.alezzgo.testpag.ui.chat
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 
-@SuppressLint("CoroutineCreationDuringComposition", "UnrememberedMutableState")
 @Composable
 fun ChatPage(
     navController: NavController,
@@ -47,30 +46,41 @@ fun ChatPage(
     val coroutineScope = rememberCoroutineScope()
 
     ObserveAsEvents(flow = chatEvents) { event ->
-        Log.d("ChatPage","ObserveAsEvents() event=$event")
-        when(event){
-            is ChatEffect.ScrollTo -> coroutineScope.launch { listState.animateScrollToItem(event.index) }
-            is ChatEffect.NavigateToMessageDetails -> navController.navigate(Screen.MessageDetails(event.messageId))
+        Log.d("ChatPage", "ObserveAsEvents() event=$event")
+        when (event) {
+            is ChatEffect.ScrollTo ->
+                coroutineScope.launch { listState.animateScrollToItem(event.index) }
+            is ChatEffect.NavigateToMessageDetails ->
+                navController.navigate(Screen.MessageDetails(messageId = event.messageId))
         }
     }
-    FirstVisibleItemChangedNotifier(listState,onAction)
+    FirstVisibleItemChangedNotifier(listState, onAction)
 
     Scaffold {
         Column(modifier = Modifier.padding(it)) {
 
-            //todo: need fix logger spam:
-            //todo: updateAcquireFence: Did not find frame.
-            //todo: Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
+            //todo: 1 need fix logger spam:
+            //updateAcquireFence: Did not find frame.
+            //Unable to acquire a buffer item, very likely client tried to acquire more than maxImages buffers
+            //todo: 2 paddings
+            //todo: 3 animate smooth appear from bottom
 
-            //todo animate smooth appear from bottom
-
-            LazyColumn(reverseLayout = true, modifier = Modifier.weight(1f), state = listState) {
+            LazyColumn(
+                reverseLayout = true,
+                modifier = Modifier.weight(1f),
+                state = listState,
+                contentPadding = PaddingValues(8.dp)
+            ) {
                 items(chatState.messages, key = { item -> item.id }) { message ->
-                    MessageCard(modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null), message, onAction = onAction)
+                    MessageCard(
+                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                        message = message,
+                        onAction = onAction
+                    )
                 }
             }
 
-            SendPanel(inputText = chatState.inputText, onAction = onAction)
+            SendPanel(modifier = Modifier.padding(8.dp), inputText = chatState.inputText, onAction = onAction)
             Spacer(modifier = Modifier.size(32.dp))
         }
     }
