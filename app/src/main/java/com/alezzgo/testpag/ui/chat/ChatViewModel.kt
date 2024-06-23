@@ -13,7 +13,7 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class ChatViewModel @Inject constructor() : ViewModel() {
 
     val cachedList = (0..200).map { Message.random() }
     val TAG = "MainViewModel"

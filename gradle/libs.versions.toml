@@ -11,6 +11,7 @@ composeBom = "2024.06.00"
 room = "2.6.1"
 ksp = "2.0.0-1.0.21"
 hilt = "2.50"
+hiltNavigation = "1.2.0"
 composeNavigation = "2.8.0-beta03"
 serialization = "1.6.3"
 
@@ -36,6 +37,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
 
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }

@@ -1,25 +1,26 @@
-package com.alezzgo.testpag.ui.chat
+package com.alezzgo.testpag.core
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.alezzgo.testpag.ui.theme.TestPagTheme
-import com.alezzgo.testpag.ui.chat.Screen.*
+import com.alezzgo.testpag.core.Screen.Chat
+import com.alezzgo.testpag.core.Screen.MessageDetails
+import com.alezzgo.testpag.ui.chat.ChatPage
+import com.alezzgo.testpag.ui.chat.ChatViewModel
 import com.alezzgo.testpag.ui.chatdetails.ChatDetailsPage
+import com.alezzgo.testpag.ui.theme.TestPagTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val viewModel by viewModels<MainViewModel>()
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,11 +32,18 @@ class MainActivity : ComponentActivity() {
             TestPagTheme {
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = Chat){
+                NavHost(navController = navController, startDestination = Chat) {
                     composable<Chat> {
+                        val viewModel = hiltViewModel<ChatViewModel>()
+
                         val chatState = viewModel.chatState
                         val chatEvents = viewModel.chatEffects
-                        ChatPage(navController,chatState, chatEvents, onAction = viewModel::onAction)
+                        ChatPage(
+                            navController,
+                            chatState,
+                            chatEvents,
+                            onAction = viewModel::onAction
+                        )
                     }
                     composable<MessageDetails> {
                         val args = it.toRoute<MessageDetails>()

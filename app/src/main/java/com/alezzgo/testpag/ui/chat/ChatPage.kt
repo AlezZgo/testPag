@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.alezzgo.testpag.core.Screen
 import com.alezzgo.testpag.core.ui.ObserveAsEvents
 import com.alezzgo.testpag.ui.chat.ChatAction.InputTextChanged
 import com.alezzgo.testpag.ui.composables.MessageCard
