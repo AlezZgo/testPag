@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alezzgo.testpag.data.local.ChatDao
 import com.alezzgo.testpag.data.local.entities.ChatMessageEntity
+import com.alezzgo.testpag.data.local.entities.SendStatus
 import com.alezzgo.testpag.data.local.models.ChatState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -58,10 +59,11 @@ class ChatViewModel @Inject constructor(
             chatDao.upsertMessage(
                 //todo Random.nextLong() replace Random.nextLong() to smth
                 ChatMessageEntity(
-                    messageId = Random.nextLong(),
+                    messageId = System.currentTimeMillis(),
                     chatId = chatState.value.chat.id,
                     content = chatState.value.chat.text,
-                    timeStamp = System.currentTimeMillis()
+                    timeStamp = System.currentTimeMillis(),
+                    sendStatus = SendStatus.SENDING
                 )
             )
             chatDao.upsertChat(chatState.value.chat.copy(text = ""))

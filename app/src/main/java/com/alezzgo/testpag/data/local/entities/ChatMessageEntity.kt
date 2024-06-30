@@ -9,5 +9,12 @@ data class ChatMessageEntity(
     val messageId : Long,
     val chatId : Long,
     val content: String,
-    val timeStamp : Long
+    val timeStamp : Long,
+    val sendStatus : SendStatus
 )
+
+enum class SendStatus {
+    SENDING,
+    SENT,
+    FAILED
+}
