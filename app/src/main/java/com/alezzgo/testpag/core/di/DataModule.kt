@@ -2,6 +2,8 @@ package com.alezzgo.testpag.core.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
+import com.alezzgo.testpag.data.local.ChatDao
 import com.alezzgo.testpag.data.local.ChatDatabase
 import dagger.Module
 import dagger.Provides
@@ -27,4 +29,11 @@ object DataModule {
     @Singleton
     @Provides
     fun provideChatDao(db: ChatDatabase) = db.chatDao
+
+    @Singleton
+    @Provides
+    fun provideWorkManager(@ApplicationContext applicationContext: Context)
+        = WorkManager.getInstance(applicationContext)
+
+
 }
