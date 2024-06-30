@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,35 +12,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.alezzgo.testpag.core.Screen.Chat
 import com.alezzgo.testpag.core.Screen.MessageDetails
-import com.alezzgo.testpag.data.local.SyncWorker
 import com.alezzgo.testpag.ui.chat.ChatPage
 import com.alezzgo.testpag.ui.chat.ChatViewModel
 import com.alezzgo.testpag.ui.chatdetails.ChatDetailsPage
 import com.alezzgo.testpag.ui.chatdetails.MessageDetailsViewModel
 import com.alezzgo.testpag.ui.theme.TestPagTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.Serializable
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var workManager : WorkManager
-
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val work = OneTimeWorkRequestBuilder<SyncWorker>().build()
-
-        workManager
-        workManager.enqueue(work)
 
         enableEdgeToEdge()
 

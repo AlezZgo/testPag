@@ -57,7 +57,6 @@ class ChatViewModel @Inject constructor(
     private fun sendMessage() {
         viewModelScope.launch {
             chatDao.upsertMessage(
-                //todo Random.nextLong() replace Random.nextLong() to smth
                 ChatMessageEntity(
                     messageId = System.currentTimeMillis(),
                     chatId = chatState.value.chat.id,
