@@ -16,11 +16,13 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltWorker
-class SyncWorker @AssistedInject constructor(
-    @Assisted val dao: ChatDao,
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
+class SyncWorker (
+    context: Context,
+    params: WorkerParameters,
 ) : CoroutineWorker(context,params) {
+
+    private val db = DataModule.provideDb(context)
+    private val dao = db.chatDao
 
     companion object{
         const val TAG = "SyncWorker"

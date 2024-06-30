@@ -16,26 +16,4 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class App : Application(), Configuration.Provider{
-
-    @Inject lateinit var factory: CustomWorkerFactory
-
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setWorkerFactory(factory)
-            .build()
-
-}
-class CustomWorkerFactory @Inject constructor(val dao: ChatDao) : WorkerFactory(){
-    override fun createWorker(
-        appContext: Context,
-        workerClassName: String,
-        workerParameters: WorkerParameters
-    ): ListenableWorker? = SyncWorker(
-        dao = dao,
-        context = appContext,
-        params = workerParameters
-    )
-
-}
+class App : Application()
