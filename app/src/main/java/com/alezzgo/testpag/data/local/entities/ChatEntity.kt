@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 data class ChatEntity(
     @PrimaryKey
     val id : Long,
-    val text : String,
+    val draftText : String,
     val firstVisibleMessageId : Long?
 )

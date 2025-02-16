@@ -1,5 +1,12 @@
 package com.alezzgo.testpag.ui.chat
 
+import com.alezzgo.testpag.data.local.models.ChatState
+
+data class ChatUiState(
+    val dbState : ChatState,
+    val inputText : String
+)
+
 sealed interface ChatEffect {
     data class ScrollTo(val index: Int) : ChatEffect
     data class NavigateToMessageDetails(val messageId: Long) : ChatEffect

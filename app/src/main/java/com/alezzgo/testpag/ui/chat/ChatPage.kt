@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatPage(
     navController: NavController,
-    chatState: ChatState,
+    chatState: ChatUiState,
     chatEffects: Flow<ChatEffect>,
     onAction: (ChatAction) -> Unit
 ) {
@@ -73,7 +73,7 @@ fun ChatPage(
                 state = listState,
                 contentPadding = PaddingValues(8.dp)
             ) {
-                items(chatState.messages, key = { item -> item.messageId }) { message ->
+                items(chatState.dbState.messages, key = { item -> item.messageId }) { message ->
                     MessageCard(
                         modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                         message = message,
@@ -84,7 +84,7 @@ fun ChatPage(
 
             SendPanel(
                 modifier = Modifier.padding(8.dp),
-                inputText = chatState.chat.text,
+                inputText = chatState.inputText,
                 onAction = onAction
             )
             Spacer(modifier = Modifier.size(32.dp))
@@ -97,7 +97,7 @@ fun ChatPage(
 @Composable
 fun FirstVisibleItemChangedNotifier(
     listState: LazyListState,
-    chatState: ChatState,
+    chatState: ChatUiState,
     onAction: (ChatAction) -> Unit
 ) {
     //todo Разобраться как точно работает под капотом
@@ -105,7 +105,7 @@ fun FirstVisibleItemChangedNotifier(
         snapshotFlow {
             listState.firstVisibleItemIndex
         }.distinctUntilChanged().sample(300).collect { firstVisibleItemIndex ->
-            if(chatState.messages.isNotEmpty()){
+            if(chatState.dbState.messages.isNotEmpty()){
                 onAction.invoke(ChatAction.FirstVisibleIndexChanged(firstVisibleItemIndex))
             }
         }

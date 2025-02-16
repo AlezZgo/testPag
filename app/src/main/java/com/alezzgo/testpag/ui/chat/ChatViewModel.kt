@@ -1,23 +1,27 @@
 package com.alezzgo.testpag.ui.chat
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alezzgo.testpag.data.local.ChatDao
+import com.alezzgo.testpag.data.local.entities.ChatEntity
 import com.alezzgo.testpag.data.local.entities.ChatMessageEntity
 import com.alezzgo.testpag.data.local.entities.SendStatus
 import com.alezzgo.testpag.data.local.models.ChatState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -26,18 +30,40 @@ class ChatViewModel @Inject constructor(
 
     val TAG = "MainViewModel"
 
-    val chatState = chatDao.chat(0)
-        .filterNotNull()
-        .map { it.copy(messages = it.messages.sortedByDescending { it.timeStamp }) } //todo dao should return order by timestamp
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = ChatState.initial(id = 0)
-        )
+    private val inputText = MutableStateFlow<String?>("")
+
+    val chatUiState = combine(
+        chatDao.chat(0),
+        inputText
+    ) { dbChat: ChatState?, inputText: String? ->
+
+        Log.d(TAG, "dbChat=$dbChat")
+
+        //todo chat is always null!!
+        if(dbChat==null){
+            chatDao.upsertChat(ChatEntity(id = 0,"", 0))
+            return@combine
+        }
+
+        val dbChatWithSortedMessages =
+            dbChat.copy(messages = dbChat.messages.sortedByDescending { it.timeStamp })
+
+        if (inputText == null) {
+            ChatUiState(dbChatWithSortedMessages, dbChat.chat.draftText)
+        } else {
+            ChatUiState(dbChatWithSortedMessages, inputText)
+        }
+    }
+    .catch { e -> Log.e(TAG, "Error in combine", e) }
+    .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = ChatUiState(ChatState.initial(id = 0), "")
+    )
+
 
     private val _chatEffects = Channel<ChatEffect>()
     val chatEffects = _chatEffects.receiveAsFlow()
-
 
     fun onAction(action: ChatAction) {
         Log.d(TAG, "onAction() action=$action")
@@ -50,7 +76,6 @@ class ChatViewModel @Inject constructor(
                     action.messageId
                 )
             )
-            else -> {}
         }
     }
 
@@ -59,30 +84,31 @@ class ChatViewModel @Inject constructor(
             chatDao.upsertMessage(
                 ChatMessageEntity(
                     messageId = System.currentTimeMillis(),
-                    chatId = chatState.value.chat.id,
-                    content = chatState.value.chat.text,
+                    chatId = chatUiState.value.dbState.chat.id,
+                    content = chatUiState.value.inputText,
                     timeStamp = System.currentTimeMillis(),
                     sendStatus = SendStatus.SENDING
                 )
             )
-            chatDao.upsertChat(chatState.value.chat.copy(text = ""))
+            chatDao.upsertChat(chatUiState.value.dbState.chat.copy(draftText = ""))
+            inputText.update { "" }
             _chatEffects.send(ChatEffect.ScrollTo(0))
         }
     }
 
     private fun changeSendText(value: String) {
+        Log.d(TAG, "changeSendText() value=$value")
+
         viewModelScope.launch {
-            chatDao.upsertChat(
-                chatState.value.chat.copy(text = value)
-            )
+            inputText.update { value }
         }
     }
 
     private fun changeFirstVisibleMessageId(currentIndex: Int) {
         viewModelScope.launch {
             chatDao.upsertChat(
-                chatState.value.chat.copy(
-                    firstVisibleMessageId = chatState.value.messages.getOrNull(currentIndex)?.messageId
+                chatUiState.value.dbState.chat.copy(
+                    firstVisibleMessageId = chatUiState.value.dbState.messages.getOrNull(currentIndex)?.messageId
                 )
             )
         }

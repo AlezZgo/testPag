@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                     composable<Chat> {
                         val viewModel = hiltViewModel<ChatViewModel>()
 
-                        val chatState by viewModel.chatState.collectAsStateWithLifecycle()
+                        val chatState by viewModel.chatUiState.collectAsStateWithLifecycle()
                         val chatEvents = viewModel.chatEffects
 
                         ChatPage(
