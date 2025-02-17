@@ -66,7 +66,9 @@ class ChatViewModel @Inject constructor(
     val chatEffects = _chatEffects.receiveAsFlow()
 
     fun onAction(action: ChatAction) {
+
         Log.d(TAG, "onAction() action=$action")
+
         when (action) {
             is ChatAction.SendMessage -> sendMessage()
             is ChatAction.FirstVisibleIndexChanged -> changeFirstVisibleMessageId(action.index)
