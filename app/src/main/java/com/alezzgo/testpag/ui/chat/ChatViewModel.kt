@@ -1,7 +1,6 @@
 package com.alezzgo.testpag.ui.chat
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alezzgo.testpag.data.local.ChatDao
@@ -13,10 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -42,7 +39,7 @@ class ChatViewModel @Inject constructor(
         //todo chat is always null!!
         if(dbChat==null){
             chatDao.upsertChat(ChatEntity(id = 0,"", 0))
-            return@combine
+            return@combine ChatUiState(ChatState.initial(id = 0), "")
         }
 
         val dbChatWithSortedMessages =
